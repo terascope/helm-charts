@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kafka.fullname" . }}-headless
+  labels:
+  {{- include "kafka.broker.labels" . | nindent 4 }}
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+{{- if .Values.headless.annotations }}
+{{ .Values.headless.annotations | toYaml | trimSuffix "\n" | indent 4 }}
+{{- end }}
+spec:
+  ports:
+  - name: broker
+    port: {{ .Values.headless.broker.port }}
+{{- if .Values.headless.broker.targetPort }}
+    targetPort: {{ .Values.headless.broker.targetPort }}
+{{- end }}
+  - name: controller  
+    port: {{ .Values.headless.controller.port }}
+{{- if .Values.headless.controller.targetPort }}
+    targetPort: {{ .Values.headless.controller.targetPort }}
+{{- end }}
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+  {{- include "kafka.broker.matchLabels" . | nindent 4 }}

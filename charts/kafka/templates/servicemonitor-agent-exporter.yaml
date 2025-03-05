@@ -1,0 +1,26 @@
+{{ if and .Values.prometheus.agent.enabled .Values.prometheus.operator.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "kafka.fullname" . }}-agent-exporter
+  namespace: {{ include "serviceMonitor.namespace" . }}
+  labels:
+    {{- include "kafka.agent-monitor.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kafka.agent-monitor.matchLabels" . | nindent 6 }}
+  endpoints:
+  - port: agent-exporter
+    interval: {{ .Values.prometheus.agent.interval }}
+    {{- if .Values.prometheus.agent.scrapeTimeout }}
+    scrapeTimeout: {{ .Values.prometheus.agent.scrapeTimeout }}
+    {{- end }}
+    metricRelabelings:
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.metricRelabelings | nindent 6 }}
+    relabelings:
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.relabelings | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}

@@ -1,0 +1,27 @@
+{{- if and .Values.prometheus.kafkaTopicUsage.enabled .Values.prometheus.operator.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "kafka.fullname" . }}-kafkatopicusage-exporter
+  namespace: {{ include "serviceMonitor.namespace" . }}
+  labels:
+    {{- include "kafka.kafka-topic-usage-exporter.labels" . | nindent 4 }}
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.selector | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+    {{- include "kafka.kafka-topic-usage-exporter.matchLabels" . | nindent 6 }}
+  endpoints:
+  - port: kafka-topic-usage-exporter
+    interval: "{{ .Values.prometheus.kafkaTopicUsage.interval }}"
+    {{- if .Values.prometheus.kafkaTopicUsage.scrapeTimeout }}
+    scrapeTimeout: "{{ .Values.prometheus.kafkaTopicUsage.scrapeTimeout }}"
+    {{- end }}
+    metricRelabelings:
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.metricRelabelings | nindent 6 }}
+    relabelings:
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.relabelings | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}

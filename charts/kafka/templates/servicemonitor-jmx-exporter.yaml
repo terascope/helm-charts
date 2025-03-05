@@ -1,0 +1,27 @@
+{{ if and .Values.prometheus.jmx.enabled .Values.prometheus.operator.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "kafka.fullname" . }}-jmx-exporter
+  namespace: {{ include "serviceMonitor.namespace" . }}
+  labels:
+    {{- include "kafka.monitor.labels" . | nindent 4 }}
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.selector | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+    {{- include "kafka.broker.matchLabels" . | nindent 6 }}
+  endpoints:
+  - port: jmx-exporter
+    interval: {{ .Values.prometheus.jmx.interval }}
+    {{- if .Values.prometheus.jmx.scrapeTimeout }}
+    scrapeTimeout: {{ .Values.prometheus.jmx.scrapeTimeout }}
+    {{- end }}
+    metricRelabelings:
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.metricRelabelings | nindent 6 }}
+    relabelings:
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.relabelings | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}

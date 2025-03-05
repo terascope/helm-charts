@@ -1,0 +1,15 @@
+apiVersion: v1
+description: Apache Kafka is publish-subscribe messaging rethought as a distributed commit log.
+name: kafka
+version: 1.0.0
+appVersion: 3.7.1
+keywords:
+- kafka
+- kafka statefulset
+home: https://kafka.apache.org/
+sources:
+- https://github.com/helm/charts/tree/master/incubator/kafka
+- https://github.com/Yolean/kubernetes-kafka
+- https://github.com/apache/kafka
+- https://github.com/terascope/helm-charts
+icon: https://kafka.apache.org/images/apache-kafka.png
