@@ -226,7 +226,7 @@ podDisruptionBudget: {}
 ## here in map format, as defined in the official docs.
 ## ref: https://kafka.apache.org/documentation/#brokerconfigs
 ##
-configurationOverrides:
+configurationOverrides: {}
   # "auto.leader.rebalance.enable": true
   # "auto.create.topics.enable": true
   # "controlled.shutdown.enable": true
