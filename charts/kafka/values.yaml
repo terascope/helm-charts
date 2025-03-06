@@ -251,6 +251,20 @@ configurationOverrides:
   # "listener.security.protocol.map": |-
   #   PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
 
+  ## Options to enable SSL using PEM format
+  ## advertised.listeners here are appended to the defaults, not overwritten
+  # advertised.listeners: "TLS://kafka-headless.default.svc.cluster.local:9094"
+  # listener.security.protocol.map: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,TLS:SSL"
+  # listeners: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,TLS://0.0.0.0:9094"
+  # security.protocol: "ssl"
+  # ssl.client.auth: "none"
+  # ssl.keystore.location: "/etc/kafka/secrets/broker-keypair.pem" # key followed by cert
+  # ssl.keystore.type: "PEM"
+  # ssl.truststore.location: "/etc/kafka/secrets/CAs/rootCA.pem"
+  # ssl.truststore.type: "PEM"
+  # inter.broker.listener.name: "PLAINTEXT"
+  # security.inter.broker.protocol: "SSL"
+
 ## set extra ENVs
 #   key: "value"
 envOverrides: {}
