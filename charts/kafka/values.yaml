@@ -251,13 +251,36 @@ configurationOverrides: {}
   # "listener.security.protocol.map": |-
   #   PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
 
-  ## Options to enable SSL using PEM format
+  ## SSL/TLS encryption
+  ## Documentation: https://kafka.apache.org/documentation/#security
   ## advertised.listeners here are appended to the defaults, not overwritten
   # advertised.listeners: "TLS://kafka-headless.default.svc.cluster.local:9094"
   # listener.security.protocol.map: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,TLS:SSL"
   # listeners: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,TLS://0.0.0.0:9094"
   # security.protocol: "ssl"
   # ssl.client.auth: "none"
+  #
+  ## Options to enable SSL using PEM format
+  ## Provide either ssl.keystore.location & ssl.truststore.location 
+  ## or ssl.keystore.key & ssl.keystore.certificate.chain
+  # ssl.keystore.certificate.chain: |
+  #   -----BEGIN CERTIFICATE-----\  # server cert
+  #   MIIEyDCCAzCgAwIBAgIRAO8MGa5Gv9KBRb7D0Rcyj24wDQYJKoZIhvcNAQELBQAw\
+  #   ...
+  #   xnwiB0bI7V6Kf5KVgisZDtJF8APTfHy4ey3mXA==\
+  #   -----END CERTIFICATE-----\ # intermediate certs would come next
+  #   -----BEGIN CERTIFICATE-----\ # root cert
+  #   MIIFJzCCA4+gAwIBAgIQX6DM59eAmZLzzdoyD0jbtDANBgkqhkiG9w0BAQsFADCB\
+  #   ...
+  #   R4eNRWMls7ceteGynZLUL0LULwW8Wio8w3Ht\
+  #   -----END CERTIFICATE-----
+  # ssl.keystore.key: |
+  #   -----BEGIN PRIVATE KEY-----\
+  #   MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCyI8ugVF4Og0Os\
+  #   ...
+  #   AdkIu2G1Xt6aidSQX8P5lxE1XadgO8b1JC8v86W4wzXnIZXZP/PE5U3w6eDdAI9w\
+  #   X3ENvVkJ02bIDoRJ1oHchbHA\
+  #   -----END PRIVATE KEY----
   # ssl.keystore.location: "/etc/kafka/secrets/broker-keypair.pem" # key followed by cert
   # ssl.keystore.type: "PEM"
   # ssl.truststore.location: "/etc/kafka/secrets/CAs/rootCA.pem"
