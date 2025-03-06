@@ -94,11 +94,11 @@ topologySpreadConstraints: []
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
 ##
 readinessProbe:
-  initialDelaySeconds: 10
-  periodSeconds: 10
+  initialDelaySeconds: 60
+  periodSeconds: 60
   timeoutSeconds: 10
   successThreshold: 1
-  failureThreshold: 60
+  failureThreshold: 10
 
 livenessProbe:
   initialDelaySeconds: 480
