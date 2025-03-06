@@ -134,11 +134,15 @@ service:
 headless:
   # annotations:
   broker:
-    # targetPort:
-    port: 9092
+    plaintext:
+      port: 9092
+      # targetPort:
+    ssl:
+      port: 9094
+      # targetPort:
   controller:  
-    # targetPort:
     port: 9093
+    # targetPort:
 
 clusterDomain: cluster.local
 
@@ -164,6 +168,18 @@ extraInitContainers:
 ## extraContainers is a list of sidecar containers. Specified as a YAML list.
 #
 extraContainers: null
+
+extraVolumes:
+  ## example volume to supply ssl certs
+  # - name: certs
+  #   hostPath:
+  #     path: /certs
+  #     type: Directory
+
+extraVolumeMounts:
+  ## example volumeMount to supply ssl certs
+  # - mountPath: /etc/kafka/secrets
+  #   name: certs
 
 ## External access.
 ##
@@ -210,7 +226,7 @@ podDisruptionBudget: {}
 ## here in map format, as defined in the official docs.
 ## ref: https://kafka.apache.org/documentation/#brokerconfigs
 ##
-configurationOverrides: {}
+configurationOverrides:
   # "auto.leader.rebalance.enable": true
   # "auto.create.topics.enable": true
   # "controlled.shutdown.enable": true

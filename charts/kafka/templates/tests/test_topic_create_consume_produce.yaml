@@ -1,5 +1,5 @@
 {{- if .Values.testsEnabled -}}
-{{- $bootstrapServer := printf "%s-headless.%s.svc.%s:%d" (include "kafka.fullname" .) .Release.Namespace .Values.clusterDomain ( int .Values.headless.broker.port) -}}
+{{- $bootstrapServer := printf "%s-headless.%s.svc.%s:%d" (include "kafka.fullname" .) .Release.Namespace .Values.clusterDomain ( int .Values.headless.broker.plaintext.port) -}}
 apiVersion: v1
 kind: Pod
 metadata:

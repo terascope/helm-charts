@@ -55,7 +55,7 @@ Default statefulset broker configuration settings
 controller.listener.names: "CONTROLLER"
 controller.quorum.bootstrap.servers: "{{ include "kafka.controllerQuorumBootstrapServers" . }}"
 controller.quorum.voters: "{{ include "kafka.controllerQuorumVoters" . }}"
-listeners: "PLAINTEXT://0.0.0.0:{{ .Values.headless.broker.port }},CONTROLLER://0.0.0.0:{{ .Values.headless.controller.port }}"
+listeners: "PLAINTEXT://0.0.0.0:{{ .Values.headless.broker.plaintext.port }},CONTROLLER://0.0.0.0:{{ .Values.headless.controller.port }}"
 listener.security.protocol.map: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
 log.dirs: "{{ .Values.persistence.mountPath }}/{{ .Values.logSubPath }}"
 process.roles: "broker,controller"

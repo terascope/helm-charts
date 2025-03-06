@@ -194,10 +194,12 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         ports:
-        - containerPort: {{ .Values.headless.broker.port }}
+        - containerPort: {{ .Values.headless.broker.plaintext.port }}
           name: kafka
         - containerPort: {{ .Values.headless.controller.port }}
           name: controller
+        - containerPort: {{ .Values.headless.broker.ssl.port }}
+          name: kafka-ssl
         {{- if .Values.external.enabled }}
           {{- $replicas := .Values.replicas | int }}
           {{- $root := . }}
@@ -291,9 +293,9 @@ spec:
           export LOAD_BALANCER_IP=$(echo '{{ .Values.external.loadBalancerIP }}' | tr -d '[]' | cut -d ' ' -f "$(($KAFKA_NODE_ID + 1))") && \
           {{- end }}
           {{- if eq .Values.external.type "NodePort" }}
-          export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_IP}:{{ .Values.headless.broker.port }}{{ if kindIs "string" $advertisedListenersOverride }}{{ printf ",%s" $advertisedListenersOverride }}{{ end }} && \
+          export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_IP}:{{ .Values.headless.broker.plaintext.port }}{{ if kindIs "string" $advertisedListenersOverride }}{{ printf ",%s" $advertisedListenersOverride }}{{ end }} && \
           {{- else }}
-          export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_NAME}.{{ include "kafka.fullname" . }}-headless.${POD_NAMESPACE}.svc.{{ .Values.clusterDomain }}:{{ .Values.headless.broker.port }}{{ if kindIs "string" $advertisedListenersOverride }}{{ printf ",%s" $advertisedListenersOverride }}{{ end }} && \
+          export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_NAME}.{{ include "kafka.fullname" . }}-headless.${POD_NAMESPACE}.svc.{{ .Values.clusterDomain }}:{{ .Values.headless.broker.plaintext.port }}{{ if kindIs "string" $advertisedListenersOverride }}{{ printf ",%s" $advertisedListenersOverride }}{{ end }} && \
           {{- end }}
           exec /etc/kafka/docker/run
         volumeMounts:
@@ -321,8 +323,11 @@ spec:
         - name: jmx
           mountPath: /var/lib/prometheus
         {{- end }}
+        {{- if .Values.extraVolumeMounts }}
+          {{- toYaml .Values.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       {{- if .Values.extraContainers }}
-        {{ toYaml .Values.extraContainers | indent 8}}
+        {{ toYaml .Values.extraContainers | indent 8 }}
       {{- end }}
       volumes:
       {{- if not .Values.persistence.enabled }}
@@ -341,6 +346,9 @@ spec:
       {{- if .Values.prometheus.agent.enabled }}
       - name: jmx
         emptyDir: {}
+      {{- end }}
+      {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
       {{- end }}
       {{- if .Values.securityContext }}
       securityContext:

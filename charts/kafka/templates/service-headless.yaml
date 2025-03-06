@@ -11,15 +11,20 @@ metadata:
 {{- end }}
 spec:
   ports:
-  - name: broker
-    port: {{ .Values.headless.broker.port }}
-{{- if .Values.headless.broker.targetPort }}
-    targetPort: {{ .Values.headless.broker.targetPort }}
+  - name: broker-plaintext
+    port: {{ .Values.headless.broker.plaintext.port }}
+{{- if .Values.headless.broker.plaintext.targetPort }}
+    targetPort: {{ .Values.headless.broker.plaintext.targetPort }}
 {{- end }}
   - name: controller  
     port: {{ .Values.headless.controller.port }}
 {{- if .Values.headless.controller.targetPort }}
     targetPort: {{ .Values.headless.controller.targetPort }}
+{{- end }}
+  - name: broker-ssl
+    port: {{ .Values.headless.broker.ssl.port }}
+{{- if .Values.headless.broker.ssl.targetPort }}
+    targetPort: {{ .Values.headless.broker.ssl.targetPort }}
 {{- end }}
   clusterIP: None
   publishNotReadyAddresses: true
