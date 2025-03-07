@@ -286,7 +286,7 @@ configurationOverrides: {}
   # ssl.truststore.location: "/etc/kafka/secrets/CAs/rootCA.pem"
   # ssl.truststore.type: "PEM"
   # inter.broker.listener.name: "PLAINTEXT"
-  # security.inter.broker.protocol: "SSL"
+  # security.inter.broker.protocol: "PLAINTEXT"
 
 ## set extra ENVs
 #   key: "value"
