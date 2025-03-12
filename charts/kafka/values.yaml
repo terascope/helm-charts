@@ -281,7 +281,7 @@ configurationOverrides: {}
   #   AdkIu2G1Xt6aidSQX8P5lxE1XadgO8b1JC8v86W4wzXnIZXZP/PE5U3w6eDdAI9w\
   #   X3ENvVkJ02bIDoRJ1oHchbHA\
   #   -----END PRIVATE KEY----
-  # ssl.keystore.location: "/etc/kafka/secrets/broker-keypair.pem" # key followed by cert
+  # ssl.keystore.location: "/etc/kafka/secrets/kafka-keypair.pem" # key followed by cert
   # ssl.keystore.type: "PEM"
   # ssl.truststore.location: "/etc/kafka/secrets/CAs/rootCA.pem"
   # ssl.truststore.type: "PEM"
@@ -434,7 +434,7 @@ prometheus:
     scrapeTimeout: 10s
 
     ## Port jmx-exporter exposes Prometheus format metrics to scrape
-    port: 5556
+    port: 5555
 
     resources: {}
       # limits:
