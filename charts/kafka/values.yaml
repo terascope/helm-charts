@@ -94,11 +94,11 @@ topologySpreadConstraints: []
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
 ##
 readinessProbe:
-  initialDelaySeconds: 10
-  periodSeconds: 10
+  initialDelaySeconds: 60
+  periodSeconds: 60
   timeoutSeconds: 10
   successThreshold: 1
-  failureThreshold: 60
+  failureThreshold: 10
 
 livenessProbe:
   initialDelaySeconds: 480
@@ -134,11 +134,15 @@ service:
 headless:
   # annotations:
   broker:
-    # targetPort:
-    port: 9092
+    plaintext:
+      port: 9092
+      # targetPort:
+    ssl:
+      port: 9094
+      # targetPort:
   controller:  
-    # targetPort:
     port: 9093
+    # targetPort:
 
 clusterDomain: cluster.local
 
@@ -164,6 +168,18 @@ extraInitContainers:
 ## extraContainers is a list of sidecar containers. Specified as a YAML list.
 #
 extraContainers: null
+
+extraVolumes:
+  ## example volume to supply ssl certs
+  # - name: certs
+  #   hostPath:
+  #     path: /certs
+  #     type: Directory
+
+extraVolumeMounts:
+  ## example volumeMount to supply ssl certs
+  # - mountPath: /etc/kafka/secrets
+  #   name: certs
 
 ## External access.
 ##
@@ -234,6 +250,43 @@ configurationOverrides: {}
   ## Uncomment to define the EXTERNAL Listener protocol
   # "listener.security.protocol.map": |-
   #   PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+  ## SSL/TLS encryption
+  ## Documentation: https://kafka.apache.org/documentation/#security
+  ## advertised.listeners here are appended to the defaults, not overwritten
+  # advertised.listeners: "TLS://kafka-headless.default.svc.cluster.local:9094"
+  # listener.security.protocol.map: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,TLS:SSL"
+  # listeners: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,TLS://0.0.0.0:9094"
+  # security.protocol: "ssl"
+  # ssl.client.auth: "none"
+  #
+  ## Options to enable SSL using PEM format
+  ## Provide either ssl.keystore.location & ssl.truststore.location 
+  ## or ssl.keystore.key & ssl.keystore.certificate.chain
+  # ssl.keystore.certificate.chain: |
+  #   -----BEGIN CERTIFICATE-----\  # server cert
+  #   MIIEyDCCAzCgAwIBAgIRAO8MGa5Gv9KBRb7D0Rcyj24wDQYJKoZIhvcNAQELBQAw\
+  #   ...
+  #   xnwiB0bI7V6Kf5KVgisZDtJF8APTfHy4ey3mXA==\
+  #   -----END CERTIFICATE-----\ # intermediate certs would come next
+  #   -----BEGIN CERTIFICATE-----\ # root cert
+  #   MIIFJzCCA4+gAwIBAgIQX6DM59eAmZLzzdoyD0jbtDANBgkqhkiG9w0BAQsFADCB\
+  #   ...
+  #   R4eNRWMls7ceteGynZLUL0LULwW8Wio8w3Ht\
+  #   -----END CERTIFICATE-----
+  # ssl.keystore.key: |
+  #   -----BEGIN PRIVATE KEY-----\
+  #   MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCyI8ugVF4Og0Os\
+  #   ...
+  #   AdkIu2G1Xt6aidSQX8P5lxE1XadgO8b1JC8v86W4wzXnIZXZP/PE5U3w6eDdAI9w\
+  #   X3ENvVkJ02bIDoRJ1oHchbHA\
+  #   -----END PRIVATE KEY----
+  # ssl.keystore.location: "/etc/kafka/secrets/kafka-keypair.pem" # key followed by cert
+  # ssl.keystore.type: "PEM"
+  # ssl.truststore.location: "/etc/kafka/secrets/CAs/rootCA.pem"
+  # ssl.truststore.type: "PEM"
+  # inter.broker.listener.name: "PLAINTEXT"
+  # security.inter.broker.protocol: "PLAINTEXT"
 
 ## set extra ENVs
 #   key: "value"
@@ -381,7 +434,7 @@ prometheus:
     scrapeTimeout: 10s
 
     ## Port jmx-exporter exposes Prometheus format metrics to scrape
-    port: 5556
+    port: 5555
 
     resources: {}
       # limits:
