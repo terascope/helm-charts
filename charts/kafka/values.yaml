@@ -15,7 +15,6 @@ imageTag: "3.7.1"
 ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
 imagePullPolicy: "IfNotPresent"
 
-
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources: {}
@@ -128,7 +127,7 @@ service:
   broker:
     port: 9092
     targetPort: kafka
-    
+
 ## Headless service.
 ##
 headless:
@@ -140,7 +139,7 @@ headless:
     ssl:
       port: 9094
       # targetPort:
-  controller:  
+  controller:
     port: 9093
     # targetPort:
 
@@ -148,7 +147,7 @@ clusterDomain: cluster.local
 
 ## extraInitContainers is a list of init containers. Specified as a YAML list.
 #
-extraInitContainers: 
+extraInitContainers:
   ## This example downloads the JMX Exporter Java agent to the /var/lib/prometheus folder,
   ## allowing the use of the agent by setting prometheus.agent.enabled to true.
   # - name: jmx-agent
@@ -261,7 +260,7 @@ configurationOverrides: {}
   # ssl.client.auth: "none"
   #
   ## Options to enable SSL using PEM format
-  ## Provide either ssl.keystore.location & ssl.truststore.location 
+  ## Provide either ssl.keystore.location & ssl.truststore.location
   ## or ssl.keystore.key & ssl.keystore.certificate.chain
   # ssl.keystore.certificate.chain: |
   #   -----BEGIN CERTIFICATE-----\  # server cert
@@ -291,7 +290,6 @@ configurationOverrides: {}
 ## set extra ENVs
 #   key: "value"
 envOverrides: {}
-
 
 ## A collection of additional ports to expose on brokers (formatted as normal containerPort yaml)
 # Useful when the image exposes metrics (like prometheus, etc.) through a javaagent instead of a sidecar
@@ -327,7 +325,6 @@ jmx:
   ## that can be derived easily.  The configMap in this chart cleans up the metrics it exposes to be in a Prometheus
   ## format, eg topic, broker are labels and not part of metric name. Improvements are gladly accepted and encouraged.
   configMap:
-
     ## Allows disabling the default configmap, note a configMap is needed
     enabled: true
 
@@ -338,55 +335,63 @@ jmx:
       lowercaseOutputName: true
       lowercaseOutputLabelNames: true
       ssl: false
-      whitelistObjectNames: ["kafka.controller:*","kafka.server:*","java.lang:*","kafka.network:*","kafka.log:*", "jvm:*"]
+      whitelistObjectNames:
+        [
+          "kafka.controller:*",
+          "kafka.server:*",
+          "java.lang:*",
+          "kafka.network:*",
+          "kafka.log:*",
+          "jvm:*",
+        ]
       rules:
-      - pattern: kafka.server<type=(BrokerTopicMetrics), name=(BytesInPerSec|BytesOutPerSec|MessagesInPerSec|Failed.+), topic=(.+)><>Count
-        name: kafka_server_$1_$2_total
-        labels:
-          topic: "$3"
-        type: COUNTER
+        - pattern: kafka.server<type=(BrokerTopicMetrics), name=(BytesInPerSec|BytesOutPerSec|MessagesInPerSec|Failed.+), topic=(.+)><>Count
+          name: kafka_server_$1_$2_total
+          labels:
+            topic: "$3"
+          type: COUNTER
 
-      # Node-level replica stats
-      - pattern: kafka.server<type=(ReplicaManager), name=(UnderReplicatedPartitions|UnderMinIsrPartitionCount|OfflineReplicaCount|LeaderCount|PartitionCount)><>Value
-        name: kafka_server_$1_$2_value
-        type: GAUGE
-      - pattern: kafka.server<type=(ReplicaManager), name=(IsrExpandsPerSec|IsrShrinksPerSec)><>Value
-        name: kafka_server_$1_$2_total
-        type: COUNTER
+        # Node-level replica stats
+        - pattern: kafka.server<type=(ReplicaManager), name=(UnderReplicatedPartitions|UnderMinIsrPartitionCount|OfflineReplicaCount|LeaderCount|PartitionCount)><>Value
+          name: kafka_server_$1_$2_value
+          type: GAUGE
+        - pattern: kafka.server<type=(ReplicaManager), name=(IsrExpandsPerSec|IsrShrinksPerSec)><>Value
+          name: kafka_server_$1_$2_total
+          type: COUNTER
 
-      # Node-level replica lag. This could also be tracked at partition-level granularity, but this would
-      # get extremely expensive given the number of Kafka nodes and partitions
-      - pattern: kafka.server<type=(ReplicaFetcherManager), name=(MaxLag), clientId=(Replica)><>Value
-        name: kafka_server_$1_$2_value
-        type: GAUGE
+        # Node-level replica lag. This could also be tracked at partition-level granularity, but this would
+        # get extremely expensive given the number of Kafka nodes and partitions
+        - pattern: kafka.server<type=(ReplicaFetcherManager), name=(MaxLag), clientId=(Replica)><>Value
+          name: kafka_server_$1_$2_value
+          type: GAUGE
 
-      # Request stats
-      - pattern: kafka.network<type=(RequestMetrics), name=(RequestsPerSec|TotalTimeMs|RequestQueueTimeMs|LocalTimeMs|RemoteTimeMs|ResponseQueueTimeMs|ResponseSendTimeMs), request=(Produce|FetchConsumer|FetchFollower)><>Count
-        name: kafka_network_$1_$2_total
-        labels:
-          request: "$3"
-        type: COUNTER
+        # Request stats
+        - pattern: kafka.network<type=(RequestMetrics), name=(RequestsPerSec|TotalTimeMs|RequestQueueTimeMs|LocalTimeMs|RemoteTimeMs|ResponseQueueTimeMs|ResponseSendTimeMs), request=(Produce|FetchConsumer|FetchFollower)><>Count
+          name: kafka_network_$1_$2_total
+          labels:
+            request: "$3"
+          type: COUNTER
 
-      # Controller stats
-      - pattern: kafka.controller<type=(ControllerStats), name=(LeaderElectionRateAndTimeMs|UncleanLeaderElectionsPerSec)><>Count
-        name: kafka_controller_$1_$2_total
-        type: COUNTER
-      - pattern: kafka.controller<type=(KafkaController), name=(ActiveControllerCount|OfflinePartitionsCount)><>Value
-        name: kafka_controller_$1_$2_value
-        type: GAUGE
+        # Controller stats
+        - pattern: kafka.controller<type=(ControllerStats), name=(LeaderElectionRateAndTimeMs|UncleanLeaderElectionsPerSec)><>Count
+          name: kafka_controller_$1_$2_total
+          type: COUNTER
+        - pattern: kafka.controller<type=(KafkaController), name=(ActiveControllerCount|OfflinePartitionsCount)><>Value
+          name: kafka_controller_$1_$2_value
+          type: GAUGE
 
-      - pattern: kafka.(\w+)<type=(.+), name=(.+)><>(\d+)thPercentile
-        name: kafka_$1_$2_$3
-        type: GAUGE
-        labels:
-          quantile: "0.$4"
+        - pattern: kafka.(\w+)<type=(.+), name=(.+)><>(\d+)thPercentile
+          name: kafka_$1_$2_$3
+          type: GAUGE
+          labels:
+            quantile: "0.$4"
 
-      - pattern: kafka.log<type=Log, name=(.+), topic=(.+), partition=(.+)><>Value
-        name: kafka_log_$1
-        type: COUNTER
-        labels:
-          topic: "$2"
-          partition: "$3"
+        - pattern: kafka.log<type=Log, name=(.+), topic=(.+), partition=(.+)><>Value
+          name: kafka_log_$1
+          type: COUNTER
+          labels:
+            topic: "$2"
+            partition: "$3"
 
     ## If you would like to supply your own ConfigMap for JMX metrics, supply the name of that
     ## ConfigMap as an `overrideName` here.
@@ -406,11 +411,11 @@ jmx:
   ## (warning its crazy excessive and they aren't formatted in a prometheus style) (1) `whitelistObjectNames: []`
   ## (2) commented out above `overrideConfig`.
   whitelistObjectNames:  # []
-  - kafka.controller:*
-  - kafka.server:*
-  - java.lang:*
-  - kafka.network:*
-  - kafka.log:*
+    - kafka.controller:*
+    - kafka.server:*
+    - java.lang:*
+    - kafka.network:*
+    - kafka.log:*
 
 ## Prometheus Exporters / Metrics
 ##
@@ -507,8 +512,8 @@ prometheus:
 
   ## WARNING: this feature is not enabled as there is no public image
   kafkaTopicUsage:
-    enabled: false # Do Not Enable
-    image: # There is no public image for this exporter currently
+    enabled: false  # Do Not Enable
+    image:  # There is no public image for this exporter currently
     imageTag: 0.0.3
     interval: 60s
     kafkaInterval: 6000
@@ -619,7 +624,7 @@ configJob:
 ##
 ## Note: To increase the 'replicationFactor' of a topic, 'reassignPartitions' must be set to true (see above).
 ##
-## **WARNING**: this feature has not been implemented 
+## **WARNING**: this feature has not been implemented
 topics: []
   # - name: myExistingTopicConfig
   #   config: "cleanup.policy=compact,delete.retention.ms=604800000"
