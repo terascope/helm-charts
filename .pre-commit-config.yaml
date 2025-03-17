@@ -1,0 +1,26 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ct-lint
+        name: Chart Testing Lint
+        entry: ct lint --config .github/ct.yaml
+        language: system
+        files: ^charts/
+
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.14.2
+    hooks:
+      - id: helm-docs # use local binary
+        args:
+          # Make the tool search for charts only under the `charts` directory
+          - --chart-search-root=charts
+
+          # Keep values order from values.yaml file
+          - --sort-values-order=file
+
+          # The `./` makes it relative to the chart-search-root set above
+          # - --template-files=./_templates.gotmpl
+
+          # Repeating the flag adds this to the list, now [./_templates.gotmpl, README.md.gotmpl]
+          # A base filename makes it relative to each chart directory found
+          # - --template-files=README.md.gotmpl

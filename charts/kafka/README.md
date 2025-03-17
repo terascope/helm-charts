@@ -1,5 +1,7 @@
 # Apache Kafka Helm Chart
 
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![AppVersion: 3.7.1](https://img.shields.io/badge/AppVersion-3.7.1-informational?style=flat-square)
+
 This is an implementation of Kafka StatefulSet found here:
 
 * <https://github.com/Yolean/kubernetes-kafka>
