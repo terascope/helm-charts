@@ -127,9 +127,9 @@ following configurable parameters:
 | service.broker.port | int | `9092` | Broker port to be used for the service. |
 | service.broker.targetPort | string | `"kafka"` | Broker target port to be used for the service. |
 | headless.annotations | list | `[]` | List of annotations for the headless service. https://kubernetes.io/docs/concepts/services-networking/service/#headless-services |
-| headless.broker.plaintext.port | int | `9092` | Broker plaintext port to be used for the headless service.  |
+| headless.broker.plaintext.port | int | `9092` | Broker plaintext port to be used for the headless service. |
 | headless.broker.plaintext.targetPort | string | `nil` | Broker plaintext target port to be used for the headless service. This is not a required value. |
-| headless.broker.ssl.port | int | `9094` | Broker ssl port to be used for the headless service.  |
+| headless.broker.ssl.port | int | `9094` | Broker ssl port to be used for the headless service. |
 | headless.broker.ssl.targetPort | string | `nil` | Broker ssl target port to be used for the headless service. This is not a required value. |
 | headless.controller.port | int | `9093` | Controller port to be used for the headless service. |
 | headless.controller.targetPort | string | `nil` | Controller target port to be used for the headless service. This is not a required value. |
@@ -201,8 +201,8 @@ following configurable parameters:
 | prometheus.operator.serviceMonitor.namespace | string | `"monitoring"` | Namespace in which to install the ServiceMonitor resource. Default to kube-prometheus install. |
 | prometheus.operator.serviceMonitor.releaseNamespace | bool | `false` | Set namespace to release namespace |
 | prometheus.operator.serviceMonitor.selector | object | `{"prometheus":"kube-prometheus"}` | Default to kube-prometheus install (CoreOS recommended), but should be set according to Prometheus install |
-| prometheus.operator.serviceMonitor.relabelings | list | see `values.yaml`  | Relabel a target before scrape |
-| prometheus.operator.serviceMonitor.metricRelabelings | list | see `values.yaml`  | Relabel a metric before sample ingestion    |
+| prometheus.operator.serviceMonitor.relabelings | list | see `values.yaml` | Relabel a target before scrape |
+| prometheus.operator.serviceMonitor.metricRelabelings | list | see `values.yaml` | Relabel a metric before sample ingestion |
 | prometheus.operator.prometheusRule.enabled | bool | `false` | True to create a PrometheusRule resource for Prometheus Operator, False if not |
 | prometheus.operator.prometheusRule.namespace | string | `"monitoring"` | Namespace in which to install the PrometheusRule resource. Default to kube-prometheus install. |
 | prometheus.operator.prometheusRule.releaseNamespace | bool | `false` | Set namespace to release namespace |
