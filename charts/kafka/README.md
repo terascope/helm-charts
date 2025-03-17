@@ -11,7 +11,7 @@ This is an implementation of Kafka StatefulSet found here:
 * <https://github.com/apache/kafka>
 * <https://github.com/terascope/helm-charts>
 
-## Pre Requisites
+## Prerequisites
 
 * `apache/kafka` version 3.7.0 or later
 
@@ -73,17 +73,17 @@ To install the chart with the release name `kafka` in the default
 namespace:
 
 ```bash
-helm repo add terascope http://github.com/orgs/terascope/charts - FIXME: check this
-helm install --name kafka terascope/kafka - FIXME: check this
+helm repo add terascope https://terascope.github.io/helm-charts/
+helm install kafka terascope/kafka
 ```
 
 If using a dedicated namespace(recommended) then make sure the namespace
 exists with:
 
 ```bash
-helm repo add terascope http://github.com/orgs/terascope/charts - FIXME: check this
+helm repo add terascope https://terascope.github.io/helm-charts/
 kubectl create ns kafka
-helm install --name kafka --namespace kafka terascope/kafka - FIXME: check this
+helm install kafka --namespace kafka terascope/kafka
 ```
 
 **NOTE**: The install command output will contain instructions for setting up a test client pod, and commands for listing topics, creating a topic, and producing and consuming messages.
@@ -216,7 +216,7 @@ Specify parameters using `--set key=value[,key=value]` argument to `helm install
 Alternatively a YAML file that specifies the values for the parameters can be provided like this:
 
 ```bash
-helm install --name kafka -f values.yaml terascope/kafka # FIXME check this
+helm install kafka -f values.yaml terascope/kafka
 ```
 
 ### Zookeeper Chart
