@@ -154,12 +154,12 @@ headless:
   annotations: []
   broker:
     plaintext:
-      # -- Broker plaintext port to be used for the headless service. 
+      # -- Broker plaintext port to be used for the headless service.
       port: 9092
       # -- Broker plaintext target port to be used for the headless service. This is not a required value.
       targetPort: null
     ssl:
-      # -- Broker ssl port to be used for the headless service. 
+      # -- Broker ssl port to be used for the headless service.
       port: 9094
       # -- Broker ssl target port to be used for the headless service. This is not a required value.
       targetPort: null
@@ -588,7 +588,7 @@ prometheus:
         prometheus: kube-prometheus
 
       # -- Relabel a target before scrape
-      # @default -- see `values.yaml` 
+      # @default -- see `values.yaml`
       relabelings:
         - sourceLabels: [__meta_kubernetes_pod_node_name]
           targetLabel: instance
@@ -598,8 +598,8 @@ prometheus:
           regex: kafka-(.*)
           replacement: $1
           targetLabel: kafka_cluster
-      # -- Relabel a metric before sample ingestion   
-      # @default -- see `values.yaml` 
+      # -- Relabel a metric before sample ingestion
+      # @default -- see `values.yaml`
       metricRelabelings:
         - action: drop
           sourceLabels: [topic]
