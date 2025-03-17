@@ -190,13 +190,6 @@ following configurable parameters:
 | prometheus.kafka.tolerations | list | `[]` | Tolerations for nodes that have taints on them. Useful if you want to dedicate nodes to just run kafka-exporter https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
 | prometheus.kafka.affinity | object | `{}` | Pod scheduling preferences (by default keep pods within a release on separate nodes). By default we don't set affinity. ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity |
 | prometheus.kafka.nodeSelector | object | `{}` | Node labels for pod assignment ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector |
-| prometheus.kafkaTopicUsage.enabled | bool | `false` |  |
-| prometheus.kafkaTopicUsage.image | string | `nil` |  |
-| prometheus.kafkaTopicUsage.imageTag | string | `"0.0.3"` |  |
-| prometheus.kafkaTopicUsage.interval | string | `"60s"` |  |
-| prometheus.kafkaTopicUsage.kafkaInterval | int | `6000` |  |
-| prometheus.kafkaTopicUsage.port | int | `3000` |  |
-| prometheus.kafkaTopicUsage.resources | object | `{}` |  |
 | prometheus.operator.enabled | bool | `false` | True if using the Prometheus Operator, False if not |
 | prometheus.operator.serviceMonitor.namespace | string | `"monitoring"` | Namespace in which to install the ServiceMonitor resource. Default to kube-prometheus install. |
 | prometheus.operator.serviceMonitor.releaseNamespace | bool | `false` | Set namespace to release namespace |

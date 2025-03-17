@@ -560,16 +560,6 @@ prometheus:
     # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
     nodeSelector: {}
 
-  ## WARNING: this feature is not enabled as there is no public image
-  kafkaTopicUsage:
-    enabled: false  # Do Not Enable
-    image:  # There is no public image for this exporter currently
-    imageTag: 0.0.3
-    interval: 60s
-    kafkaInterval: 6000
-    port: 3000
-    resources: {}
-
   operator:
     # -- True if using the Prometheus Operator, False if not
     enabled: false
