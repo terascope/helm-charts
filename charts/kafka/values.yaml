@@ -2,21 +2,21 @@
 # Kafka:
 # ------------------------------------------------------------------------------
 
-## The StatefulSet installs 3 pods by default
+# -- Kafka Brokers created by StatefulSet
 replicas: 3
 
-## The kafka image repository
+# -- Kafka Container image name
 image: "apache/kafka"
 
-## The kafka image tag
+# -- Kafka Container image tag
 imageTag: "3.7.1"
 
-## Specify a imagePullPolicy
-## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+# -- Kafka Container imagePullPolicy
+# ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
 imagePullPolicy: "IfNotPresent"
 
-## Configure resource requests and limits
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+# -- Kafka resource requests and limits
+# ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources: {}
   # limits:
   #   cpu: 200m
@@ -24,51 +24,56 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 1024Mi
+
+# -- Kafka broker JVM heap options
 kafkaHeapOptions: "-Xmx1G -Xms1G"
 
-## Optional Container Security context
+# -- Optional Kafka Container Security context
 securityContext:
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
 
-## The StatefulSet Update Strategy which Kafka will use when changes are applied.
-## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+# -- The StatefulSet Update Strategy which Kafka will use when changes are applied.
+# ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
 updateStrategy:
   type: "OnDelete"
 
-## Start and stop pods in Parallel or OrderedReady (one-by-one.)  Note - Can not change after first release.
-## ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#pod-management-policy
+# -- Start and stop pods in Parallel or OrderedReady (one-by-one.)  Note - Can not change after first release.
+# ref: https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#pod-management-policy
 podManagementPolicy: Parallel
 
 ## Useful if using any custom authorizer
-## Pass in some secrets to use (if required)
-# secrets:
+# -- Pass any secrets to the kafka pods. Each secret will be passed as an environment variable by default.
+# The secret can also be mounted to a specific path if required. Environment variable names are generated as:
+# `<secretName>_<secretKey>` (All upper case)
+secrets: {}
 # - name: myKafkaSecret
 #   keys:
 #     - username
 #     - password
 #   # mountPath: /opt/kafka/secret
 
-## The subpath within the Kafka container's PV where logs will be stored.
-## This is combined with `persistence.mountPath`, to create, by default: /opt/kafka/data/logs
+# -- The subpath within the Kafka container's PV where logs will be stored.
+# This is combined with `persistence.mountPath`, to create, by default: /opt/kafka/data/logs
 logSubPath: "logs"
 
-## Use an alternate scheduler, e.g. "stork".
-## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
-##
-# schedulerName:
+# -- Name of Kubernetes scheduler (other than the default), e.g. "stork".
+# ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+schedulerName:
 
-## Use an alternate serviceAccount
-## Useful when using images in custom repositories
-# serviceAccountName:
+# -- Name of Kubernetes serviceAccount. serviceAccount
+# Useful when using images in custom repositories
+serviceAccountName:
 
-## Set a pod priorityClassName
-# priorityClassName: high-priority
+# -- Name of Kubernetes Pod PriorityClass.
+# https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
+priorityClassName:
 
 ## Pod scheduling preferences (by default keep pods within a release on separate nodes).
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ## By default we don't set affinity
+# -- Defines affinities and anti-affinities for pods as defined in:
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity preferences
 affinity: {}
 ## Alternatively, this typical example defines:
 ## antiAffinity (to keep Kafka pods on separate pods)
@@ -83,35 +88,46 @@ affinity: {}
 #           - kafka
 #       topologyKey: "kubernetes.io/hostname"
 
-## Node labels for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+# -- Node labels for pod assignment
+# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
 nodeSelector: {}
 
+# -- Control how Pods are spread across your cluster
 topologySpreadConstraints: []
 
 ## Readiness probe config.
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
 ##
 readinessProbe:
+  # -- Number of seconds before probe is initiated.
   initialDelaySeconds: 60
+  # -- How often (in seconds) to perform the probe.
   periodSeconds: 60
+  # -- Number of seconds after which the probe times out.
   timeoutSeconds: 10
+  # -- Minimum consecutive successes for the probe to be considered successful after having failed.
   successThreshold: 1
+  # -- After the probe fails this many times, pod will be marked Unready.
   failureThreshold: 10
 
 livenessProbe:
+  # -- Number of seconds before probe is initiated.
   initialDelaySeconds: 480
+  # -- How often (in seconds) to perform the probe.
   periodSeconds: 60
+  # -- Number of seconds after which the probe times out.
   timeoutSeconds: 30
+  # -- Minimum consecutive successes for the probe to be considered successful after having failed.
   successThreshold: 1
+  # -- After the probe fails this many times, pod will be marked Unready.
   failureThreshold: 10
 
-## Period to wait for broker graceful shutdown (sigterm) before pod is killed (sigkill)
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
 ## ref: https://kafka.apache.org/10/documentation.html#brokerconfigs controlled.shutdown.*
-terminationGracePeriodSeconds: 30
+# -- Period to wait for broker graceful shutdown (sigterm) before pod is killed (sigkill)
+terminationGracePeriodSeconds: 600
 
-# Tolerations for nodes that have taints on them.
+# -- Tolerations for nodes that have taints on them.
 # Useful if you want to dedicate nodes to just run kafka
 # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
@@ -125,27 +141,38 @@ tolerations: []
 ##
 service:
   broker:
+    # -- Broker port to be used for the service.
     port: 9092
+    # -- Broker target port to be used for the service.
     targetPort: kafka
 
 ## Headless service.
 ##
 headless:
-  # annotations:
+  # -- List of annotations for the headless service.
+  # https://kubernetes.io/docs/concepts/services-networking/service/#headless-services
+  annotations: []
   broker:
     plaintext:
+      # -- Broker plaintext port to be used for the headless service. 
       port: 9092
-      # targetPort:
+      # -- Broker plaintext target port to be used for the headless service. This is not a required value.
+      targetPort: null
     ssl:
+      # -- Broker ssl port to be used for the headless service. 
       port: 9094
-      # targetPort:
+      # -- Broker ssl target port to be used for the headless service. This is not a required value.
+      targetPort: null
   controller:
+    # -- Controller port to be used for the headless service.
     port: 9093
-    # targetPort:
+    # -- Controller target port to be used for the headless service. This is not a required value.
+    targetPort: null
 
+# -- Domain in which to advertise Kafka listeners
 clusterDomain: cluster.local
 
-## extraInitContainers is a list of init containers. Specified as a YAML list.
+# -- Additional Kafka init containers. Specified as a YAML list.
 #
 extraInitContainers:
   ## This example downloads the JMX Exporter Java agent to the /var/lib/prometheus folder,
@@ -164,10 +191,11 @@ extraInitContainers:
   #     - name: jmx
   #       mountPath: /var/lib/prometheus
 
-## extraContainers is a list of sidecar containers. Specified as a YAML list.
+# -- Additional Kafka sidecar containers. Specified as a YAML list.
 #
 extraContainers: null
 
+# -- Additional Kafka volumes. Specified as a YAML list.
 extraVolumes:
   ## example volume to supply ssl certs
   # - name: certs
@@ -175,6 +203,7 @@ extraVolumes:
   #     path: /certs
   #     type: Directory
 
+# -- Additional Kafka volume mounts. Specified as a YAML list.
 extraVolumeMounts:
   ## example volumeMount to supply ssl certs
   # - mountPath: /etc/kafka/secrets
@@ -183,48 +212,61 @@ extraVolumeMounts:
 ## External access.
 ##
 external:
+  # -- If True, exposes Kafka brokers via NodePort (PLAINTEXT by default)
   enabled: false
-  # type can be either NodePort or LoadBalancer
+  # -- Service Type: can be either NodePort or LoadBalancer
   type: NodePort
-  # externalTrafficPolicy can be either Cluster or Local
+  # -- Service desires to route external traffic to node-local(Local) or cluster-wide(Cluster) endpoints.
   externalTrafficPolicy: Local
-  # annotations:
+  # -- Additional annotations for the external service.
+  annotations: {}
   #  service.beta.kubernetes.io/openstack-internal-load-balancer: "true"
-  # Labels to be added to external services
-  # labels:
+  # Additional labels for the external service.
+  labels: {}
   #  aLabel: "value"
   dns:
+    # -- If True, add Annotation for internal DNS service
     useInternal: false
+    # -- If True, add Annotation for external DNS service
     useExternal: true
-  # If using external service type LoadBalancer and external dns, set distinct to true below.
+  # -- If using external service type LoadBalancer and external dns, set distinct to true below.
   # This creates an A record for each statefulset pod/broker. You should then map the
   # A record of the broker to the EXTERNAL IP given by the LoadBalancer in your DNS server.
   distinct: false
+  # -- TCP port configured at external services (one per pod) to relay from NodePort to the external listener port.
   servicePort: 19092
+  # -- TCP port which is added pod index number to arrive at the port used for NodePort and external listener port.
   firstListenerPort: 31090
+  # -- Domain in which to advertise Kafka external listeners.
   domain: cluster.local
+  # -- Add Static IP to the type Load Balancer. Depends on the provider if enabled
   loadBalancerIP: []
+  # -- Add IP ranges that are allowed to access the Load Balancer.
   loadBalancerSourceRanges: []
   init:
+    # -- Init image
     image: "lwolf/kubectl_deployer"
+    # -- Init image tag
     imageTag: "0.4"
+    # -- Init image pull policy
     imagePullPolicy: "IfNotPresent"
 
-# Annotation to be added to Kafka pods
+# -- Annotation to be added to Kafka pods
 podAnnotations: {}
 
-# Labels to be added to Kafka pods
+# -- Labels to be added to Kafka pods
 podLabels: {}
   # service: broker
   # team: developers
 
+# -- Define a Disruption Budget for the Kafka Pods
 podDisruptionBudget: {}
   # maxUnavailable: 1  # Limits how many Kafka pods may be unavailable due to voluntary disruptions.
 
-## Configuration Overrides. Specify any Kafka settings you would like set on the StatefulSet
-## here in map format, as defined in the official docs.
-## ref: https://kafka.apache.org/documentation/#brokerconfigs
-##
+# -- Specify any Kafka configuration setting overrides you would like set on the StatefulSet
+# here in map format, as defined in the official docs.
+# ref: https://kafka.apache.org/documentation/#brokerconfigs
+#
 configurationOverrides: {}
   # "auto.leader.rebalance.enable": true
   # "auto.create.topics.enable": true
@@ -287,37 +329,36 @@ configurationOverrides: {}
   # inter.broker.listener.name: "PLAINTEXT"
   # security.inter.broker.protocol: "PLAINTEXT"
 
-## set extra ENVs
+# -- Add additional Environment Variables in the dictionary format.
 #   key: "value"
 envOverrides: {}
 
-## A collection of additional ports to expose on brokers (formatted as normal containerPort yaml)
-# Useful when the image exposes metrics (like prometheus, etc.) through a javaagent instead of a sidecar
+# -- A collection of additional ports to expose on brokers (formatted as normal containerPort yaml).
+# Useful when the image exposes metrics (like prometheus, etc.) through a javaagent instead of a sidecar.
 additionalPorts: {}
 
 ## Persistence configuration. Specify if and how to persist data to a persistent volume.
 ##
 persistence:
+  # -- Use a PVC to persist data
   enabled: true
 
-  ## The size of the PersistentVolume to allocate to each Kafka Pod in the StatefulSet. For
-  ## production servers this number should likely be much larger.
-  ##
+  # -- The size of the PersistentVolume to allocate to each Kafka Pod in the StatefulSet. For
+  # production servers this number should likely be much larger.
   size: "1Gi"
 
-  ## The location within the Kafka container where the PV will mount its storage and Kafka will
-  ## store its logs.
-  ##
+  # -- The location within the Kafka container where the PV will mount its storage and Kafka will
+  # store its logs.
   mountPath: "/opt/kafka/data"
 
   ## Kafka data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
+  ## If set to null (the default) or undefined, no storageClassName spec is
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass:
+  # -- Storage class of backing PVC
+  storageClass: null
 
 jmx:
   ## Rules to apply to the Prometheus JMX Exporter.  Note while lots of stats have been cleaned and exposed,
@@ -325,12 +366,13 @@ jmx:
   ## that can be derived easily.  The configMap in this chart cleans up the metrics it exposes to be in a Prometheus
   ## format, eg topic, broker are labels and not part of metric name. Improvements are gladly accepted and encouraged.
   configMap:
-    ## Allows disabling the default configmap, note a configMap is needed
+    # -- Enable the default ConfigMap for JMX, note a configMap is needed
     enabled: true
 
-    ## Allows setting values to generate confimap
     ## To allow all metrics through (warning its crazy excessive) comment out below `overrideConfig` and set
     ## `whitelistObjectNames: []`
+    # -- Allows config file to be generated by passing values to ConfigMap
+    # @default -- see `values.yaml`
     overrideConfig:
       lowercaseOutputName: true
       lowercaseOutputLabelNames: true
@@ -393,23 +435,28 @@ jmx:
             topic: "$2"
             partition: "$3"
 
-    ## If you would like to supply your own ConfigMap for JMX metrics, supply the name of that
-    ## ConfigMap as an `overrideName` here.
+    # -- Allows setting the name of the ConfigMap to be used
     overrideName: ""
 
-  ## Port the jmx metrics are exposed in native jmx format, not in Prometheus format
+  # -- The jmx port which JMX style metrics are exposed (note: these are not scrapeable by Prometheus)
   port: 5555
 
   remote:
+    # -- Enable remote JMX access
     enabled: true
+    # -- Block all remote accerss
     localOnly: false
+    # -- Require ssl to connect remotely
     ssl: false
+    # -- Require remote authentication
     authenticate: false
 
   ## JMX Whitelist Objects, can be set to control which JMX metrics are exposed.  Only whitelisted
   ## values will be exposed via JMX Exporter.  They must also be exposed via Rules.  To expose all metrics
   ## (warning its crazy excessive and they aren't formatted in a prometheus style) (1) `whitelistObjectNames: []`
   ## (2) commented out above `overrideConfig`.
+  # -- Allows setting which JMX objects you want to expose via JMX stats to JMX Exporter
+  # @default -- see `values.yaml`
   whitelistObjectNames:  # []
     - kafka.controller:*
     - kafka.server:*
@@ -424,23 +471,25 @@ prometheus:
   # NOTE: This jmx exporter has not been used, and the exporter running
   #       in the kafka broker container is the preferred method.
   jmx:
+    # -- Whether or not to expose JMX metrics to Prometheus
     enabled: false
 
-    ## The image to use for the metrics collector
+    # -- JMX exporter container image
     image: docker.io/solsson/kafka-prometheus-jmx-exporter@sha256
 
-    ## The image tag to use for the metrics collector
+    # -- JMX exporter container image tag
     imageTag: 70852d19ab9182c191684a8b08ac831230006d82e65d1db617479ea27884e4e8
 
-    ## Interval at which Prometheus scrapes metrics, note: only used by Prometheus Operator
+    # -- Interval at which Prometheus scrapes JMX metrics, note: only used by Prometheus Operator
     interval: 10s
 
-    ## Timeout at which Prometheus timeouts scrape run, note: only used by Prometheus Operator
+    # -- Timeout at which Prometheus timeouts scrape run, note: only used by Prometheus Operator
     scrapeTimeout: 10s
 
-    ## Port jmx-exporter exposes Prometheus format metrics to scrape
+    # -- JMX Exporter Port which exposes metrics in Prometheus format for scraping
     port: 5555
 
+    # -- Allows setting resource limits for jmx sidecar container
     resources: {}
       # limits:
       #   cpu: 200m
@@ -451,24 +500,25 @@ prometheus:
 
   ## Prometheus Kafka Exporter: exposes complimentary metrics to JMX Exporter
   kafka:
+    # -- Whether or not to create a separate Kafka exporter
     enabled: false
 
-    ## The image to use for the metrics collector
+    # -- Kafka Exporter container image
     image: docker.io/danielqsj/kafka-exporter
 
-    ## The image tag to use for the metrics collector
+    # -- Kafka Exporter container image tag
     imageTag: v1.8.0
 
-    ## Interval at which Prometheus scrapes metrics, note: only used by Prometheus Operator
+    # -- Interval at which Prometheus scrapes Kafka metrics, note: only used by Prometheus Operator
     interval: 10s
 
-    ## Timeout at which Prometheus timeouts scrape run, note: only used by Prometheus Operator
+    # -- Timeout at which Prometheus timeouts scrape run, note: only used by Prometheus Operator
     scrapeTimeout: 10s
 
-    ## Port kafka-exporter exposes for Prometheus to scrape metrics
+    # -- Kafka Exporter Port which exposes metrics in Prometheus format for scraping
     port: 9308
 
-    ## Resource limits
+    # -- Allows setting resource limits for kafka-exporter pod
     resources: {}
     #      limits:
     #        cpu: 200m
@@ -477,7 +527,7 @@ prometheus:
     #        cpu: 100m
     #        memory: 100Mi
 
-    # Tolerations for nodes that have taints on them.
+    # -- Tolerations for nodes that have taints on them.
     # Useful if you want to dedicate nodes to just run kafka-exporter
     # https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
     tolerations: []
@@ -487,9 +537,9 @@ prometheus:
     #   value: "value"
     #   effect: "NoSchedule"
 
-    ## Pod scheduling preferences (by default keep pods within a release on separate nodes).
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-    ## By default we don't set affinity
+    # -- Pod scheduling preferences (by default keep pods within a release on separate nodes).
+    # By default we don't set affinity.
+    # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
     affinity: {}
     ## Alternatively, this typical example defines:
     ## affinity (to encourage Kafka Exporter pods to be collocated with Kafka pods)
@@ -506,8 +556,8 @@ prometheus:
     #                - kafka
     #          topologyKey: "kubernetes.io/hostname"
 
-    ## Node labels for pod assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+    # -- Node labels for pod assignment
+    # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
     nodeSelector: {}
 
   ## WARNING: this feature is not enabled as there is no public image
@@ -521,21 +571,24 @@ prometheus:
     resources: {}
 
   operator:
-    ## Are you using Prometheus Operator?
+    # -- True if using the Prometheus Operator, False if not
     enabled: false
 
     serviceMonitor:
-      # Namespace in which to install the ServiceMonitor resource.
+      # -- Namespace in which to install the ServiceMonitor resource. Default to kube-prometheus install.
       namespace: monitoring
-      # Use release namespace instead
+      # -- Set namespace to release namespace
       releaseNamespace: false
 
       ## Defaults to whats used if you follow CoreOS [Prometheus Install Instructions](https://github.com/coreos/prometheus-operator/tree/master/helm#tldr)
       ## [Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/prometheus/templates/prometheus.yaml#L65)
       ## [Kube Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/kube-prometheus/values.yaml#L298)
+      # -- Default to kube-prometheus install (CoreOS recommended), but should be set according to Prometheus install
       selector:
         prometheus: kube-prometheus
 
+      # -- Relabel a target before scrape
+      # @default -- see `values.yaml` 
       relabelings:
         - sourceLabels: [__meta_kubernetes_pod_node_name]
           targetLabel: instance
@@ -545,6 +598,8 @@ prometheus:
           regex: kafka-(.*)
           replacement: $1
           targetLabel: kafka_cluster
+      # -- Relabel a metric before sample ingestion   
+      # @default -- see `values.yaml` 
       metricRelabelings:
         - action: drop
           sourceLabels: [topic]
@@ -553,23 +608,23 @@ prometheus:
           sourceLabels: [kafka_topic]
           regex: (test.*|temp.*|__consumer.*)
     prometheusRule:
-      ## Add Prometheus Rules?
+      # -- True to create a PrometheusRule resource for Prometheus Operator, False if not
       enabled: false
 
-      ## Namespace in which to install the PrometheusRule resource.
+      # -- Namespace in which to install the PrometheusRule resource. Default to kube-prometheus install.
       namespace: monitoring
-      # Use release namespace instead
+      # -- Set namespace to release namespace
       releaseNamespace: false
 
       ## Defaults to whats used if you follow CoreOS [Prometheus Install Instructions](https://github.com/coreos/prometheus-operator/tree/master/helm#tldr)
       ## [Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/prometheus/templates/prometheus.yaml#L65)
       ## [Kube Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/kube-prometheus/values.yaml#L298)
+      # -- Default to kube-prometheus install (CoreOS recommended), but should be set according to Prometheus install
       selector:
         prometheus: kube-prometheus
 
-      ## Some example rules.
-      ## e.g. max(kafka_controller_kafkacontroller_activecontrollercount_value{service="my-kafka-release"}) by (service) < 1
-      rules:
+      # -- Define the prometheus rules. See values file for examples.
+      rules: {}
       # - alert: KafkaNoActiveControllers
       #   annotations:
       #     message: The number of active controllers in {{ "{{" }} $labels.namespace {{ "}}" }} is less than 1. This usually means that some of the Kafka nodes aren't communicating properly. If it doesn't resolve itself you can try killing the pods (one by one whilst monitoring the under-replicated partitions graph).
@@ -584,30 +639,33 @@ prometheus:
       #   for: 5m
       #   labels:
       #     severity: critical
+
   ## Prometheus Java Agent JMX Exporter
   agent:
+    # -- Whether or not to expose JMX metrics to Prometheus as a Java Agent (alternative to prometheus.jmx)
     enabled: false
 
-    ## https://github.com/prometheus/jmx_exporter/releases
+    # -- JMX Agent Exporter version
+    # https://github.com/prometheus/jmx_exporter/releases
     version: 1.1.0
 
-    ## Interval at which Prometheus scrapes metrics, note: only used by Prometheus Operator
+    # -- Interval at which Prometheus scrapes JMX metrics, note: only used by Prometheus Operator
     interval: 30s
 
-    ## Timeout at which Prometheus timeouts scrape run, note: only used by Prometheus Operator
+    # -- Timeout at which Prometheus timeouts scrape run, note: only used by Prometheus Operator
     scrapeTimeout: 30s
 
-    ## Port agent exposes for Prometheus to scrape metrics
+    # -- JMX Exporter Port which exposes metrics in Prometheus format for scraping
     port: 5557
 
-    ## Custom label selector
+    # -- Custom label selector
     selector: {}
 
 ## Kafka Config job configuration
 ##
 configJob:
-  ## Specify the number of retries before considering kafka-config job as failed.
-  ## https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#pod-backoff-failure-policy
+  # -- Specify the number of retries before considering kafka-config job as failed.
+  # https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#pod-backoff-failure-policy
   backoffLimit: 6
 
 ## Topic creation and configuration.
@@ -624,7 +682,8 @@ configJob:
 ##
 ## Note: To increase the 'replicationFactor' of a topic, 'reassignPartitions' must be set to true (see above).
 ##
-## **WARNING**: this feature has not been implemented
+# -- List of topics to create & configure. Can specify name, partitions, replicationFactor, reassignPartitions, config. See values.yaml
+# **WARNING**: this feature has not been implemented
 topics: []
   # - name: myExistingTopicConfig
   #   config: "cleanup.policy=compact,delete.retention.ms=604800000"
@@ -651,7 +710,7 @@ topics: []
   #     - user: all
   #       operations: [ All ]
 
-## Enable/disable the chart's tests.  Useful if using this chart as a dependency of
-## another chart and you don't want these tests running when trying to develop and
-## test your own chart.
+# -- Enable/disable the chart's tests.  Useful if using this chart as a dependency of
+# another chart and you don't want these tests running when trying to develop and
+# test your own chart.
 testsEnabled: true
