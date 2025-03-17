@@ -444,7 +444,7 @@ jmx:
   remote:
     # -- Enable remote JMX access
     enabled: true
-    # -- Block all remote accerss
+    # -- Block all remote access
     localOnly: false
     # -- Require ssl to connect remotely
     ssl: false
@@ -467,7 +467,7 @@ jmx:
 ## Prometheus Exporters / Metrics
 ##
 prometheus:
-  ## Prometheus JMX Exporter: exposes the majority of Kafkas metrics
+  ## Prometheus JMX Exporter: exposes the majority of Kafka's metrics
   # NOTE: This jmx exporter has not been used, and the exporter running
   #       in the kafka broker container is the preferred method.
   jmx:

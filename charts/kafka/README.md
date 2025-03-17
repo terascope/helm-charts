@@ -171,7 +171,7 @@ following configurable parameters:
 | jmx.configMap.overrideName | string | `""` | Allows setting the name of the ConfigMap to be used |
 | jmx.port | int | `5555` | The jmx port which JMX style metrics are exposed (note: these are not scrapeable by Prometheus) |
 | jmx.remote.enabled | bool | `true` | Enable remote JMX access |
-| jmx.remote.localOnly | bool | `false` | Block all remote accerss |
+| jmx.remote.localOnly | bool | `false` | Block all remote access |
 | jmx.remote.ssl | bool | `false` | Require ssl to connect remotely |
 | jmx.remote.authenticate | bool | `false` | Require remote authentication |
 | jmx.whitelistObjectNames | list | see `values.yaml` | Allows setting which JMX objects you want to expose via JMX stats to JMX Exporter |
