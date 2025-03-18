@@ -1,0 +1,24 @@
+apiVersion: v1
+entries:
+  kafka:
+  - apiVersion: v1
+    appVersion: 3.7.1
+    created: "2025-03-18T23:54:08.667260635Z"
+    description: Apache Kafka is publish-subscribe messaging rethought as a distributed
+      commit log.
+    digest: c2b50afaadc7d8c7edf0b086a1d4fdd042a8bbe2dd6ac6e9ed2d84389e46fff1
+    home: https://kafka.apache.org/
+    icon: https://kafka.apache.org/images/apache-kafka.png
+    keywords:
+    - kafka
+    - kafka statefulset
+    name: kafka
+    sources:
+    - https://github.com/helm/charts/tree/master/incubator/kafka
+    - https://github.com/Yolean/kubernetes-kafka
+    - https://github.com/apache/kafka
+    - https://github.com/terascope/helm-charts
+    urls:
+    - https://github.com/terascope/helm-charts/releases/download/kafka-1.2.0/kafka-1.2.0.tgz
+    version: 1.2.0
+generated: "2025-03-18T23:54:08.667270724Z"
