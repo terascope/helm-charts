@@ -500,9 +500,3 @@ into the metric name instead of becoming a label. If you are curious to learn mo
 ### Kafka Exporter
 
 The [Kafka Exporter](https://github.com/danielqsj/kafka_exporter) is a complementary metrics exporter to the JMX Exporter. The Kafka Exporter provides additional statistics on Kafka Consumer Groups.
-
-### Kafka Topic Usage Exporter
-
-Kafka Topic Usage Exporter exports the disk usage of a a kafka topic per broker.
-
-**NOTE**: This exporter currently has not public image.
