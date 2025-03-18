@@ -1,0 +1,22 @@
+bash << EOF
+ct lint --config .github/ct.yaml
+CT_EXIT_CODE=$?
+
+helm-docs --chart-search-root=charts --sort-values-order=file
+HELM_DOCS_EXIT_CODE=$?
+
+# Fail the commit if either command fails
+if [ $CT_EXIT_CODE -ne 0 ] || [ $HELM_DOCS_EXIT_CODE -ne 0 ]; then
+  echo "Pre-commit hook failed."
+  exit 1
+fi
+
+# Check for uncommitted changes (caused by helm-docs modifying files)
+if ! git diff --exit-code --quiet; then
+  echo " helm-docs modified files. Commit them before proceeding."
+  exit 1
+fi
+
+echo "Pre-commit checks passed."
+exit 0
+EOF
