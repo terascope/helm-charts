@@ -1,0 +1,14 @@
+external:
+  enabled: true
+
+prometheus:
+  jmx:
+    enabled: true
+  kafka:
+    enabled: true
+  operator:
+    enabled: true
+    prometheusRule:
+      enabled: true
+  agent:
+    enabled: true

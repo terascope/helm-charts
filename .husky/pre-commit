@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+bash << EOF
+ct lint --config .github/ct.yaml
+CT_EXIT_CODE=\$?
+
+git ls-files --modified > before_modified_files.txt
+
+helm-docs --chart-search-root=charts --sort-values-order=file
+HELM_DOCS_EXIT_CODE=\$?
+
+git ls-files --modified > after_modified_files.txt
+
+# Fail the commit if either command fails
+if [ "\$CT_EXIT_CODE" -ne 0 ] || [ "\$HELM_DOCS_EXIT_CODE" -ne 0 ]; then
+  echo "Pre-commit hook failed."
+  exit 1
+fi
+
+# Check for uncommitted changes (caused by helm-docs modifying files)
+if ! diff before_modified_files.txt after_modified_files.txt > /dev/null; then
+  echo "Error: Your docs were out of sync. helm-docs has modified the files. Please commit them before proceeding."
+  rm before_modified_files.txt after_modified_files.txt
+  exit 1
+fi
+
+rm before_modified_files.txt after_modified_files.txt
+
+echo "Pre-commit checks passed."
+exit 0
+EOF

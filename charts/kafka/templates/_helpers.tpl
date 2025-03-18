@@ -152,16 +152,6 @@ app.kubernetes.io/component: kafka-agent-monitor
 {{ include "kafka.monitor.matchLabels" . }}
 {{- end -}}
 
-{{- define "kafka.kafka-topic-usage-exporter.matchLabels" -}}
-app.kubernetes.io/component: kafka-topic-usage-exporter
-{{ include "kafka.common.matchLabels" . }}
-{{- end -}}
-
-{{- define "kafka.kafka-topic-usage-exporter.labels" -}}
-{{ include "kafka.common.metaLabels" . }}
-{{ include "kafka.kafka-topic-usage-exporter.matchLabels" . }}
-{{- end -}}
-
 
 {{- define "serviceMonitor.namespace" -}}
 {{- if .Values.prometheus.operator.serviceMonitor.releaseNamespace -}}

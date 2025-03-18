@@ -51,20 +51,3 @@ spec:
   selector:
   {{- include "kafka.broker.matchLabels" . | nindent 4 }}
 {{- end }}
----
-{{- if and .Values.prometheus.kafkaTopicUsage.enabled .Values.prometheus.operator.enabled }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "kafka.fullname" . }}-kafka-topic-usage-exporter
-  labels:
-  {{- include "kafka.kafka-topic-usage-exporter.labels" . | nindent 4 }}
-spec:
-  ports:
-  - name: kafka-topic-usage-exporter
-    protocol: TCP
-    port: {{ .Values.prometheus.kafkaTopicUsage.port }}
-    targetPort: {{ .Values.prometheus.kafkaTopicUsage.port }}
-  selector:
-  {{- include "kafka.broker.matchLabels" . | nindent 4 }}
-{{- end }}
