@@ -1,6 +1,12 @@
 # Apache Kafka Helm Chart
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![AppVersion: 3.7.1](https://img.shields.io/badge/AppVersion-3.7.1-informational?style=flat-square)
+## Chart Version
+
+1.2.0
+
+## App Version
+
+3.7.1
 
 This is an implementation of Kafka StatefulSet found here:
 
