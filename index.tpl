@@ -114,10 +114,9 @@
     <section class="markdown-body">
       <h1>Terascope Helm Charts</h1>
 
-
       <h2>Overview</h2>
 
-      <p>This repository holds helm charts useful for running services for <a href="https://github.com/terascope/teraslice">Teraslice</a>.</p>
+      <p>This repository holds helm charts useful for running services for <a href="https://github.com/terascope/teraslice">Teraslice</a>. See the teraslice <a href="https://github.com/terascope/teraslice/blob/master/helm/teraslice/README.md">helm chart documentation </a>and the terascope chart <a href="https://terascope.github.io/teraslice/charts/">quickstart guide</a> for more details.</p>
 
       <h2>Usage</h2>
 
@@ -164,25 +163,47 @@
       <div class="charts">
 			{{range $key, $chartEntry := .Entries }}
         {{ if not (index $chartEntry 0).Deprecated }}
-          <div class="chart">
-            <a href="{{ (index (index $chartEntry 0).Urls 0) }}" title="{{ (index (index $chartEntry 0).Urls 0) }}">
-              <div class="icon">
-                <img class="chart-item-logo" alt="{{ $key }}'s logo" src="{{ (index $chartEntry 0).Icon }}" onerror="this.onerror=null; this.src='images/placeholder.png';">
-              </div>
-              <div class="body">
-                <p class="info">
-                  {{ (index $chartEntry 0).Name }}
-                  ({{ (index $chartEntry 0).Version }}@{{ (index $chartEntry 0).AppVersion }})
-                  <a href="https://github.com/terascope/helm-charts/releases/tag/{{ $key }}-{{ (index $chartEntry 0).Version }}">
-                    <img src="images/GitHub-Mark-32px.png" alt="github link" style="height: 16px; width: 16px; vertical-align: middle;" />
-                  </a>
-                </p>
-                <p class="description">
-                  {{ (index $chartEntry 0).Description }}
-                </p>
-              </div>
-            </a>
-          </div>
+          {{ if eq $key "teraslice-chart" }}
+            <div class="chart">
+              <a href="https://github.com/terascope/teraslice/pkgs/container/{{ $key }}" title="https://github.com/terascope/teraslice/pkgs/container/{{ $key }}">
+                <div class="icon">
+                  <img class="chart-item-logo" alt="{{ $key }}'s logo" src="{{ (index $chartEntry 0).Icon }}" onerror="this.onerror=null; this.src='images/placeholder.png';">
+                </div>
+                <div class="body">
+                  <p class="info">
+                    {{ (index $chartEntry 0).Name }}
+                    ({{ (index $chartEntry 0).Version }}@{{ (index $chartEntry 0).AppVersion }})
+                    <a href="https://github.com/terascope/teraslice/pkgs/container/{{ $key }}">
+                      <img src="images/GitHub-Mark-32px.png" alt="github link" style="height: 16px; width: 16px; vertical-align: middle;" />
+                    </a>
+                  </p>
+                  <p class="description">
+                    {{ (index $chartEntry 0).Description }}
+                  </p>
+                </div>
+              </a>
+            </div>
+          {{ else }}  
+            <div class="chart">
+              <a href="{{ (index (index $chartEntry 0).Urls 0) }}" title="{{ (index (index $chartEntry 0).Urls 0) }}">
+                <div class="icon">
+                  <img class="chart-item-logo" alt="{{ $key }}'s logo" src="{{ (index $chartEntry 0).Icon }}" onerror="this.onerror=null; this.src='images/placeholder.png';">
+                </div>
+                <div class="body">
+                  <p class="info">
+                    {{ (index $chartEntry 0).Name }}
+                    ({{ (index $chartEntry 0).Version }}@{{ (index $chartEntry 0).AppVersion }})
+                    <a href="https://github.com/terascope/helm-charts/releases/tag/{{ $key }}-{{ (index $chartEntry 0).Version }}">
+                      <img src="images/GitHub-Mark-32px.png" alt="github link" style="height: 16px; width: 16px; vertical-align: middle;" />
+                    </a>
+                  </p>
+                  <p class="description">
+                    {{ (index $chartEntry 0).Description }}
+                  </p>
+                </div>
+              </a>
+            </div>
+          {{end}}
         {{end}}
 			{{end}}
       </div>
