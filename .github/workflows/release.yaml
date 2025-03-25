@@ -31,7 +31,14 @@ jobs:
               (cd ${dir}; helm dependency build)
           done
 
+      # push an updated index.yaml to gh-pages branch
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1
         env:
           CR_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+
+  build-and-deploy-html:
+    needs: release
+    uses: ./.github/workflows/update-gh-pages.yaml
+    with:
+      reason: 'helm-charts release'

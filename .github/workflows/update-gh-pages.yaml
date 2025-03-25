@@ -1,0 +1,77 @@
+name: Update Github Pages
+
+on:
+  workflow_call:
+    inputs:
+      reason:
+        required: false
+        default: "Manually triggered"
+        type: string
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason the workflow was triggered'
+        required: true
+        type: string
+    
+run-name: Update Github Pages - ${{ inputs.reason }}
+
+jobs:
+  update-gh-pages:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+    # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+      
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Download index.yaml from teraslice repo
+        run: |
+          curl -Ss https://terascope.github.io/teraslice/charts/index.yaml > teraslice-index.yaml
+
+      - name: Merge teraslice's index.yaml
+        run: |
+          # merge index.yaml files
+          yq eval-all '. | select(fileIndex == 0) *+ select(fileIndex == 1)' index.yaml teraslice-index.yaml > merged-index.yaml
+
+          # remove duplicates and sort by version in descending order          
+          yq -i '
+            .entries.teraslice-chart |= unique_by(.version) |
+            .entries.teraslice-chart |= sort_by(.version) |
+            .entries.teraslice-chart |= reverse
+          ' merged-index.yaml
+
+          # replace old index.yaml with merged
+          mv merged-index.yaml index.yaml
+
+          # remove teraslice-index.yaml so it doesn't get merged
+          rm teraslice-index.yaml
+
+      - name: Run repo-html to build chart index.html
+        run: |
+          helm plugin install https://github.com/halkeye/helm-repo-html
+          helm repo-html
+
+      - name: Upload all files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
