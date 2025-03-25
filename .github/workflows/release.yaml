@@ -39,39 +39,6 @@ jobs:
 
   build-and-deploy-html:
     needs: release
-    runs-on: ubuntu-latest
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    permissions:
-      pages: write
-      id-token: write
-
-    # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-    # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
-      
-    steps:
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-
-      # build index.html from new index.yaml
-      - name: Run repo-html to build chart index.html
-        run: |
-          helm plugin install https://github.com/halkeye/helm-repo-html
-          helm repo-html
-
-      - name: Upload all files as artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    uses: ./.github/workflows/update-gh-pages.yaml
+    with:
+      reason: 'helm-charts release'
