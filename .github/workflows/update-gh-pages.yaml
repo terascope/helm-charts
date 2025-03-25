@@ -43,8 +43,6 @@ jobs:
       - name: Download index.yaml from teraslice repo
         run: |
           curl -Ss https://terascope.github.io/teraslice/charts/index.yaml > teraslice-index.yaml
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge teraslice's index.yaml
         run: |
