@@ -67,6 +67,11 @@ jobs:
           helm plugin install https://github.com/halkeye/helm-repo-html
           helm repo-html
 
+      - name: Update index.html timestamp
+        run: | 
+          current_date=$(date -u '+%a %b %d %Y %I:%M:%S%p UTC%z' | sed -E 's/(UTC[+-][0-9]{2})([0-9]{2})/\1:\2/')
+          sed -i "s/BUILD_TIME/$current_date/g" index.html
+
       - name: Upload all files as artifact
         uses: actions/upload-pages-artifact@v3
         with:
