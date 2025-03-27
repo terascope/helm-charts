@@ -116,7 +116,7 @@
 
       <h2>Overview</h2>
 
-      <p>This repository holds helm charts useful for running services for <a href="https://github.com/terascope/teraslice">Teraslice</a>. See the teraslice <a href="https://github.com/terascope/teraslice/blob/master/helm/teraslice/README.md">helm chart documentation </a>and the terascope chart <a href="https://terascope.github.io/teraslice/charts/">quickstart guide</a> for more details.</p>
+      <p>This repository holds helm charts useful for running services for <a href="https://github.com/terascope/teraslice">Teraslice</a>. See the teraslice <a href="https://github.com/terascope/teraslice/blob/master/helm/teraslice/README.md">helm chart documentation </a>and the terascope chart <a href="https://terascope.github.io/teraslice/docs/getting-started">quickstart guide</a> for more details.</p>
 
       <h2>Usage</h2>
 
