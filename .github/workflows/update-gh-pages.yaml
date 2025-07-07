@@ -52,15 +52,19 @@ jobs:
           # merge index.yaml files
           yq eval-all '. | select(fileIndex == 0) *+ select(fileIndex == 1)' index.yaml teraslice-index.yaml > merged-index.yaml
 
-          # remove duplicates and sort by version in descending order          
-          yq -i '
-            .entries.teraslice-chart |= unique_by(.version) |
-            .entries.teraslice-chart |= sort_by(.version) |
-            .entries.teraslice-chart |= reverse
-          ' merged-index.yaml
+          # Remove duplicates and sort by version in descending order.
+          # It is simpler to convert the file to json and use jq, as yq is too limited to easily
+          # sort by major/minor/patch versions. Use pipefail to ensure failures are surfaced.
+          (set -o pipefail; yq -o=json merged-index.yaml |
+          jq '
+            .entries["teraslice-chart"] |= unique_by(.version) |
+            .entries["teraslice-chart"] |= sort_by(.version | split(".") | map(tonumber)) |
+            .entries["teraslice-chart"] |= reverse
+          ' |
+           yq -P) > sorted-index.yaml
 
-          # replace old index.yaml with merged
-          mv merged-index.yaml index.yaml
+          # replace old index.yaml with merged and sorted index
+          mv sorted-index.yaml index.yaml
 
           # remove teraslice-index.yaml so it doesn't get merged
           rm teraslice-index.yaml
