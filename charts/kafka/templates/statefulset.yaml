@@ -177,8 +177,10 @@ spec:
               fieldPath: metadata.namespace
         - name: KAFKA_HEAP_OPTS
           value: {{ .Values.kafkaHeapOptions }}
+        {{- if not (hasKey .Values.configurationOverrides "offsets.topic.replication.factor") }}
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
-          value: {{ include "kafka.replication.factor" . | quote }}
+          value: {{ .Values.replicas | quote }}
+        {{- end }}  
         {{- $brokerConfigs := fromYaml (include "kafka.brokerConfigs" .) }}
         {{- range $key, $value :=  $brokerConfigs }}
         - name: {{ printf "KAFKA_%s" $key | replace "." "_" | upper | quote }}
@@ -186,7 +188,7 @@ spec:
         {{- end }}  
         {{- if .Values.prometheus.agent.enabled }}
         - name: KAFKA_JMX_OPTS
-          value: "-Dcom.sun.management.jmxremote={{ .Values.jmx.remote.enabled }} -Dcom.sun.management.jmxremote.port={{ .Values.jmx.port }} -Dcom.sun.management.jmxremote.local.port={{ .Values.jmx.port }} -Dcom.sun.management.jmxremote.local.only={{ .Values.jmx.remote.localOnly }} -Dcom.sun.management.jmxremote.authenticate={{ .Values.jmx.remote.authenticate }} -Dcom.sun.management.jmxremote.ssl=={{ .Values.jmx.remote.ssl }} -javaagent:/var/lib/prometheus/jmx_prometheus_javaagent-{{ .Values.prometheus.agent.version }}.jar={{ .Values.prometheus.agent.port }}:/etc/prometheus/jmx-kafka-prometheus.yml"
+          value: "-Dcom.sun.management.jmxremote={{ .Values.jmx.remote.enabled }} -Dcom.sun.management.jmxremote.port={{ .Values.jmx.port }} -Dcom.sun.management.jmxremote.local.port={{ .Values.jmx.port }} -Dcom.sun.management.jmxremote.local.only={{ .Values.jmx.remote.localOnly }} -Dcom.sun.management.jmxremote.authenticate={{ .Values.jmx.remote.authenticate }} -Dcom.sun.management.jmxremote.ssl={{ .Values.jmx.remote.ssl }} -javaagent:/var/lib/prometheus/jmx_prometheus_javaagent-{{ .Values.prometheus.agent.version }}.jar={{ .Values.prometheus.agent.port }}:/etc/prometheus/jmx-kafka-prometheus.yml"
         {{- end }}
         {{- if not .Values.prometheus.agent.enabled }}
         - name: KAFKA_JMX_OPTS
@@ -260,7 +262,7 @@ spec:
           {{- toYaml .Values.extraVolumeMounts | nindent 8 }}
         {{- end }}
       {{- if .Values.extraContainers }}
-        {{ toYaml .Values.extraContainers | indent 8 }}
+      {{- toYaml .Values.extraContainers | nindent 6 }}
       {{- end }}
       volumes:
       {{- if not .Values.persistence.enabled }}
@@ -281,7 +283,7 @@ spec:
         emptyDir: {}
       {{- end }}
       {{- if .Values.extraVolumes }}
-        {{- toYaml .Values.extraVolumes | nindent 8 }}
+      {{- toYaml .Values.extraVolumes | nindent 6 }}
       {{- end }}
       {{- if .Values.securityContext }}
       securityContext:
