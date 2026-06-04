@@ -7,22 +7,30 @@ on:
     paths:
       - 'charts/**'
 
+permissions: {}
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Configure Git
+        env:
+          ACTOR: ${{ github.actor }}
         run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git config user.name "$ACTOR"
+          git config user.email "$ACTOR@users.noreply.github.com"
 
       - name: Install Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 # v5.0.0
+
 
       - name: Build chart dependencies
         run: |
@@ -33,12 +41,15 @@ jobs:
 
       # push an updated index.yaml to gh-pages branch
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1
+        uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
         env:
           CR_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
 
   build-and-deploy-html:
     needs: release
+    permissions:
+      pages: write
+      id-token: write
     uses: ./.github/workflows/update-gh-pages.yaml
     with:
       reason: 'helm-charts release'
