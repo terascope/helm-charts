@@ -56,11 +56,11 @@ jobs:
       matrix:
         k8s:
           # test the 5 most recent minor versions
+          - v1.36.1
           - v1.35.5
           - v1.34.8
           - v1.33.12
           - v1.32.13
-          - v1.36.1
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
