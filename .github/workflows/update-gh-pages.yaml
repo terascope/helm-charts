@@ -75,7 +75,7 @@ jobs:
 
       - name: Run repo-html to build chart index.html
         run: |
-          helm plugin install https://github.com/halkeye/helm-repo-html --version 2a3ed85461224517b054e9180b6835f42f70c84f --verify=false # 0.2.1
+          helm plugin install https://github.com/halkeye/helm-repo-html
           helm repo-html
 
       - name: Update index.html timestamp
