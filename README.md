@@ -20,7 +20,7 @@ helm repo update
 This repo requires the following tools to perform pre-commit hooks:
 
 - `husky`
-  - run `npx husky install` from this repo. This will link the `husky` pre-commit hook file to `git`.
+  - run `npx husky` from this repo. This will link the `husky` pre-commit hook file to `git`.
   - docs: <https://typicode.github.io/husky/>
 - `ct lint`
   - install on mac with `brew install chart-testing`
