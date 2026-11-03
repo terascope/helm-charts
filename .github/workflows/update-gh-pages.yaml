@@ -22,9 +22,6 @@ jobs:
   update-gh-pages:
     runs-on: ubuntu-latest
 
-    outputs:
-      teraslice_chart_version: ${{ steps.merge-index.outputs.teraslice_chart_version }}
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -60,7 +57,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge teraslice's index.yaml
-        id: merge-index
         run: |
           # merge index.yaml files
           yq eval-all '. | select(fileIndex == 0) *+ select(fileIndex == 1)' index.yaml teraslice-index.yaml > merged-index.yaml
@@ -78,10 +74,6 @@ jobs:
 
           # replace old index.yaml with merged and sorted index
           mv sorted-index.yaml index.yaml
-
-          # entries are sorted descending, so the first is the latest teraslice chart version
-          teraslice_chart_version=$(yq '.entries["teraslice-chart"][0].version' index.yaml)
-          echo "teraslice_chart_version=$teraslice_chart_version" >> "$GITHUB_OUTPUT"
 
           # remove teraslice-index.yaml so it doesn't get merged
           rm teraslice-index.yaml
@@ -107,25 +99,12 @@ jobs:
 
   slack-announcement:
     needs: [update-gh-pages]
-    if: ${{ !cancelled() }}
+    if: ${{ failure() }}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
-      - name: Announce pages update in Slack releases channel
-        id: announce-success
-        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
-        with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            channel: ${{ vars.SLACK_RELEASES_CHANNEL_ID }}
-            text: |
-              Teraslice-chart version has been updated to `v${{ needs.update-gh-pages.outputs.teraslice_chart_version }}`.
-              Review at https://terascope.github.io/helm-charts/.
-              
       - name: Announce pages update failure in Slack releases channel
         id: announce-failure
-        if: ${{ needs.update-gh-pages.result == 'failure' }}
         uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
         with:
           method: chat.postMessage
@@ -133,13 +112,13 @@ jobs:
           payload: |
             channel: ${{ vars.SLACK_RELEASES_CHANNEL_ID }}
             text: |
-              Github Pages update failed (${{ inputs.reason }}).
+              Github Pages update of teraslice-chart version has failed (${{ inputs.reason }}).
               See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Failed Announcement Response
-        if: ${{ steps.announce-success.outputs.ok == 'false' || steps.announce-failure.outputs.ok == 'false' }}
+        if: ${{ steps.announce-failure.outputs.ok == 'false' }}
         env:
-          SLACK_RESPONSE: ${{ steps.announce-success.outputs.response || steps.announce-failure.outputs.response }}
+          SLACK_RESPONSE: ${{ steps.announce-failure.outputs.response }}
         run: |
           echo "::add-mask::$SLACK_RESPONSE"
           echo "Slackbot API failure response - $SLACK_RESPONSE"
