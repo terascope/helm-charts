@@ -107,11 +107,12 @@ jobs:
 
   slack-announcement:
     needs: [update-gh-pages]
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
       - name: Announce pages update in Slack releases channel
-        id: announce-pages-update
+        id: announce-success
         uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
         with:
           method: chat.postMessage
@@ -122,10 +123,23 @@ jobs:
               Teraslice-chart version has been updated to `v${{ needs.update-gh-pages.outputs.teraslice_chart_version }}`.
               Review at https://terascope.github.io/helm-charts/.
               
+      - name: Announce pages update failure in Slack releases channel
+        id: announce-failure
+        if: ${{ needs.update-gh-pages.result == 'failure' }}
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: ${{ vars.SLACK_RELEASES_CHANNEL_ID }}
+            text: |
+              Github Pages update failed (${{ inputs.reason }}).
+              See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       - name: Failed Announcement Response
-        if: ${{ steps.announce-pages-update.outputs.ok == 'false' }}
+        if: ${{ steps.announce-success.outputs.ok == 'false' || steps.announce-failure.outputs.ok == 'false' }}
         env:
-          SLACK_RESPONSE: ${{ steps.announce-pages-update.outputs.response }}
+          SLACK_RESPONSE: ${{ steps.announce-success.outputs.response || steps.announce-failure.outputs.response }}
         run: |
           echo "::add-mask::$SLACK_RESPONSE"
           echo "Slackbot API failure response - $SLACK_RESPONSE"
